@@ -132,15 +132,26 @@ export class PartyRoom extends DurableObject {
     }
 
     if (msg.type === "set-name") {
-      session.name = String(msg.name || "Guest").slice(0, 32);
-      this.broadcast({
-        type: "member",
-        id,
-        name: session.name,
-        count: this.sessions.size
-      });
-      return;
-    }
+  session.name = String(msg.name || "Guest").slice(0, 32);
+
+  this.broadcast({
+    type: "member",
+    id,
+    name: session.name,
+    count: this.sessions.size
+  });
+
+  // Tell a guest who the current host is so the guest
+  // can initiate the WebRTC handshake.
+  if (this.hostId && id !== this.hostId) {
+    this.send(id, {
+      type: "peer-ready",
+      hostId: this.hostId
+    });
+  }
+
+  return;
+}
 
     if (msg.type === "state") {
       if (id !== this.hostId) return;
