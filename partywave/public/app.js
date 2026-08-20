@@ -341,20 +341,37 @@ async function makePeer(targetId, initiator) {
 }
 
 async function handleSignal(from, data) {
-  if (isHost && !peers.has(from)) {
-    await makePeer(from, true);
+  let pc = peers.get(from);
+
+  // If we're the host and the guest sends us an offer,
+  // create the peer connection as the receiver.
+  if (!pc) {
+    pc = await makePeer(from, false);
   }
-  const pc = await makePeer(from, false);
+
   if (data.description) {
     await pc.setRemoteDescription(data.description);
+
     if (data.description.type === "offer") {
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      send({type:"signal",target:from,data:{description:pc.localDescription}});
+
+      send({
+        type: "signal",
+        target: from,
+        data: {
+          description: pc.localDescription
+        }
+      });
     }
   }
+
   if (data.candidate) {
-    try { await pc.addIceCandidate(data.candidate); } catch {}
+    try {
+      await pc.addIceCandidate(data.candidate);
+    } catch (err) {
+      console.warn("ICE candidate error:", err);
+    }
   }
 }
 
