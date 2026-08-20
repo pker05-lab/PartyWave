@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#10261e">
+  <title>PartyWave — synced party audio</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="/">PARTY<span>WAVE</span></a>
+    <div class="status"><i></i><span id="connectionText">Offline</span></div>
+  </header>
+
+  <main>
+    <section id="home" class="view active">
+      <div class="hero">
+        <div class="eyebrow">REAL-TIME PARTY AUDIO</div>
+        <h1>One party.<br><em>Every phone.</em></h1>
+        <p class="lede">Create a room, share the code, and send the host's captured audio to everyone connected.</p>
+        <div class="home-actions">
+          <button id="createBtn" class="btn primary">Create party <span>↗</span></button>
+          <button id="joinBtn" class="btn secondary">Join party</button>
+        </div>
+        <div class="mini-note">Best for small groups • WebRTC • Cloudflare Durable Objects</div>
+      </div>
+    </section>
+
+    <section id="create" class="view">
+      <div class="panel narrow">
+        <button class="back" data-back>← Back</button>
+        <div class="eyebrow">NEW ROOM</div>
+        <h2>Create your party</h2>
+        <p>Choose a display name. You will become the host.</p>
+        <label>Host name<input id="hostName" maxlength="32" value="Host"></label>
+        <button id="confirmCreate" class="btn primary wide">Create party</button>
+      </div>
+    </section>
+
+    <section id="join" class="view">
+      <div class="panel narrow">
+        <button class="back" data-back>← Back</button>
+        <div class="eyebrow">ENTER ROOM</div>
+        <h2>Join a party</h2>
+        <p>Ask the host for the 8-character party code.</p>
+        <label>Your name<input id="guestName" maxlength="32" value="Guest"></label>
+        <label>Party code<input id="partyCode" maxlength="8" placeholder="AB12CD34" autocomplete="off"></label>
+        <button id="confirmJoin" class="btn primary wide">Join party</button>
+      </div>
+    </section>
+
+    <section id="room" class="view">
+      <div class="room-shell">
+        <div class="room-head">
+          <div>
+            <div class="eyebrow">PARTY ROOM</div>
+            <div class="room-title"><span id="roomTitle">Untitled Party</span><span class="live-dot">● LIVE</span></div>
+          </div>
+          <div class="room-code"><span>CODE</span><strong id="roomCode">--------</strong><button id="copyCode" title="Copy code">⧉</button></div>
+        </div>
+
+        <div class="grid">
+          <aside class="side panel">
+            <div class="side-title">PARTY</div>
+            <div class="members"><strong id="memberCount">1</strong><span>connected</span></div>
+            <div id="memberList" class="member-list"></div>
+            <div class="side-actions">
+              <button id="shareBtn" class="btn secondary wide">Share invite</button>
+              <button id="leaveBtn" class="btn danger wide">Leave</button>
+            </div>
+          </aside>
+
+          <div class="main-room">
+            <div class="player panel">
+              <div class="player-top">
+                <div>
+                  <div class="eyebrow" id="providerLabel">YOUTUBE</div>
+                  <h2 id="nowTitle">No source selected</h2>
+                </div>
+                <span id="roleBadge" class="badge">GUEST</span>
+              </div>
+
+              <div id="videoWrap" class="video-wrap hidden">
+                <div id="youtubePlayer"></div>
+              </div>
+
+              <div id="sourceEmpty" class="source-empty">
+                <div class="wave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <p id="emptyText">The host hasn't started a source yet.</p>
+              </div>
+
+              <div class="transport">
+                <button id="playBtn" class="round">▶</button>
+                <div class="track"><div id="progress" class="progress"></div></div>
+                <span id="timeLabel">00:00</span>
+              </div>
+              <div class="audio-status">
+                <span id="audioState">Waiting for host audio</span>
+                <button id="enableAudioBtn" class="small-btn">Enable audio</button>
+              </div>
+            </div>
+
+            <div id="hostControls" class="panel controls hidden">
+              <div class="control-head">
+                <div><div class="eyebrow">HOST CONSOLE</div><h3>Broadcast source</h3></div>
+                <span class="secure">● HOST ONLY</span>
+              </div>
+
+              <div class="provider-tabs">
+                <button class="provider active" data-provider="youtube">YouTube</button>
+                <button class="provider" data-provider="spotify">Spotify</button>
+                <button class="provider" data-provider="youtube-music">YouTube Music</button>
+              </div>
+
+              <div class="source-grid">
+                <label class="source-input">URL / search
+                  <input id="sourceInput" placeholder="Paste a YouTube URL or video ID">
+                </label>
+                <button id="loadSourceBtn" class="btn primary">Load</button>
+              </div>
+
+              <div class="host-buttons">
+                <button id="captureBtn" class="btn primary">Start host audio broadcast</button>
+                <button id="stopCaptureBtn" class="btn secondary" disabled>Stop broadcast</button>
+              </div>
+
+              <div class="host-hint">
+                <strong>How broadcast works:</strong> your browser captures audio from the tab/window you choose in the screen-share picker and sends that audio to guests using WebRTC. When prompted, choose the tab playing your media and enable <b>Share tab audio</b>.
+              </div>
+
+              <div id="providerNotice" class="provider-notice"></div>
+            </div>
+
+            <div class="panel guest-note" id="guestNote">
+              <strong>You're connected.</strong> The host controls playback. Tap <b>Enable audio</b> if your browser blocks autoplay.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+  <audio id="remoteAudio" autoplay playsinline></audio>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

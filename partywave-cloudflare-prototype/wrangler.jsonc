@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "partywave",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-08-20",
+  "assets": {
+    "directory": "./public"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PARTY",
+        "class_name": "PartyRoom"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["PartyRoom"]
+    }
+  ]
+}
