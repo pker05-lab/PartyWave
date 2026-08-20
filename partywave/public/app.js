@@ -91,6 +91,15 @@ async function handleMessage(msg, name, host) {
     }
     return;
   }
+  if (msg.type === "peer-ready") {
+  hostId = msg.hostId;
+
+  if (!isHost && hostId && hostId !== myId) {
+    await makePeer(hostId, true);
+  }
+
+  return;
+}
   if (msg.type === "member") {
     members.set(msg.id, msg.name || "Guest");
     renderMembers(msg.count);
